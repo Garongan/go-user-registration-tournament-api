@@ -50,6 +50,12 @@ localhost:8080/profile [GET]
 ```
 - [x] Get user profile for auto complete the tournament registration form
 
+## Logout
+```bash
+localhost:8080/logout [POST]
+```
+- [x] User can logout from the system
+
 ## JWT Authentication
 
 ## How to use
