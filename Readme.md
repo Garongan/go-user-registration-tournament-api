@@ -1,8 +1,11 @@
 # Go User Registration for Online Tournament
 
+## Please to remember
+- [x] for custom connection database, please edit file [connection.go](database%2Fconnection.go)
+
 ## Sign in
 ```bash
-localhost:8080/signin [POST]
+localhost:8080/users/sign-in [POST]
 {
     "username": "username",
     "password": "password"
@@ -13,7 +16,7 @@ localhost:8080/signin [POST]
 
 ## Sign up
 ```bash
-localhost:8080/signup [POST]
+localhost:8080/users/sign-up [POST]
 {
     "name": "name",
     "phone": "phone",
@@ -26,7 +29,7 @@ localhost:8080/signup [POST]
 
 ## Register Tournament
 ```bash
-localhost:8080/tournament/register [POST]
+localhost:8080/tournaments/register [POST]
 {
     "teamName": "teamName",
     "captain": {
@@ -46,13 +49,13 @@ localhost:8080/tournament/register [POST]
 
 ## Get User Profile
 ```bash
-localhost:8080/profile [GET]
+localhost:8080/users [GET]
 ```
 - [x] Get user profile for auto complete the tournament registration form
 
 ## Logout
 ```bash
-localhost:8080/logout [POST]
+localhost:8080/users/logout [POST]
 ```
 - [x] User can logout from the system
 

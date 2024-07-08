@@ -3,9 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/utils"
 	"go-user-registration-tournament/database"
 	"go-user-registration-tournament/route"
+	"strings"
 	"time"
 )
 
@@ -18,10 +24,16 @@ func main() {
 
 	fmt.Println("Connected to database!")
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		},
+	})
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000, http://127.0.0.1:3000",
+		AllowOriginsFunc: func(origin string) bool {
+			return strings.Contains(origin, ":://localhost")
+		},
 		AllowMethods:     "GET,POST,PUT,DELETE",
 		AllowHeaders:     "Origin, Content-Type, Authorization",
 		ExposeHeaders:    "Content-Length",
@@ -29,10 +41,20 @@ func main() {
 		MaxAge:           int(12 * time.Hour / time.Second),
 	}))
 
+	app.Use(limiter.New())
+
+	app.Use(csrf.New(csrf.Config{
+		KeyLookup:      "header:X-Csrf-Token",
+		CookieName:     "csrf_",
+		CookieSameSite: "Lax",
+		ContextKey:     "csrf",
+		Expiration:     1 * time.Hour,
+		KeyGenerator:   utils.UUIDv4,
+	}))
+
+	app.Use(logger.New())
+
 	route.SetUpRoutes(app)
 
-	err = app.Listen(":8080")
-	if err != nil {
-		panic("Cannot start server!")
-	}
+	log.Fatal(app.Listen(":8080"))
 }

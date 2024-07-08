@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var _ *gorm.DB
+var DB *gorm.DB
 
 func ConnectDB() (*gorm.DB, error) {
 	connectionString := "root:password@tcp(localhost:3306)/user_registration_tournament_db"
@@ -17,8 +17,8 @@ func ConnectDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	_ = db
-	err = db.AutoMigrate(&models.User{}, &models.Account{})
+	DB = db
+	err = db.AutoMigrate(&models.Account{}, &models.User{})
 	if err != nil {
 		return nil, err
 	}
