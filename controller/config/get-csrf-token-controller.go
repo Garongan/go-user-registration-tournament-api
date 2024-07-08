@@ -1,4 +1,4 @@
-package controller
+package config
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -11,5 +11,5 @@ func GetCSRFToken(c *fiber.Ctx) error {
 			"error": "Failed to get CSRF token",
 		})
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"csrf_token": token})
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"csrf_token": token})
 }
