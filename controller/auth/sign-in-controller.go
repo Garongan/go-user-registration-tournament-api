@@ -57,7 +57,10 @@ func SignIn(c *fiber.Ctx) error {
 
 	c.Cookie(&cookie)
 
+	var user models.User
+	database.DB.Where("account_id = ?", account.ID).First(&user)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Login successfully",
+		"userId": user.ID,
 	})
 }
