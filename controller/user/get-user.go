@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"go-user-registration-tournament/database"
-	"go-user-registration-tournament/models"
+	"go-user-registration-tournament/model"
 	"os"
 )
 
@@ -31,11 +31,11 @@ func GetUser(c *fiber.Ctx) error {
 	}
 
 	accountID, _ := (*claims)["sub"].(string)
-	account := models.Account{ID: accountID}
+	account := model.Account{ID: accountID}
 
 	database.DB.Where("id = ?", accountID).First(&account)
 
-	var user models.User
+	var user model.User
 	database.DB.Where("account_id = ?", account.ID).First(&user)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{

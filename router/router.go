@@ -1,4 +1,4 @@
-package route
+package router
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -6,6 +6,7 @@ import (
 	"go-user-registration-tournament/controller/auth"
 	"go-user-registration-tournament/controller/config"
 	"go-user-registration-tournament/controller/user"
+	"go-user-registration-tournament/middleware"
 )
 
 func SetUpRoutes(app *fiber.App) {
@@ -13,8 +14,9 @@ func SetUpRoutes(app *fiber.App) {
 
 	app.Get("/csrf-token", config.GetCSRFToken)
 
-	users := app.Group("/users")
-	users.Post("/sign-up", auth.SignUp)
-	users.Post("/sign-in", auth.SignIn)
+	app.Post("/sign-up", auth.SignUp)
+	app.Post("/sign-in", auth.SignIn)
+
+	users := app.Group("/users", middleware.Protected())
 	users.Get("/", user.GetUser)
 }

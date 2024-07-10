@@ -1,4 +1,4 @@
-package models
+package model
 
 type Account struct {
 	ID       string `gorm:"type:varchar(255);primaryKey" json:"id"`

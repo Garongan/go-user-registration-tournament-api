@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/utils"
 	"go-user-registration-tournament/database"
-	"go-user-registration-tournament/route"
+	"go-user-registration-tournament/router"
 	"strings"
 	"time"
 )
@@ -54,7 +54,7 @@ func main() {
 
 	app.Use(logger.New())
 
-	route.SetUpRoutes(app)
+	router.SetUpRoutes(app)
 
 	log.Fatal(app.Listen(":8080"))
 }

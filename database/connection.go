@@ -3,25 +3,20 @@ package database
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/joho/godotenv"
-	"go-user-registration-tournament/models"
+	"go-user-registration-tournament/config"
+	"go-user-registration-tournament/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"os"
 )
 
 var DB *gorm.DB
 
 func ConnectDB() (*gorm.DB, error) {
-	if err := godotenv.Load(); err != nil {
-		return nil, err
-	}
-
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
+	dbUser := config.Config("DB_USER")
+	dbPassword := config.Config("DB_PASSWORD")
+	dbHost := config.Config("DB_HOST")
+	dbPort := config.Config("DB_PORT")
+	dbName := config.Config("DB_NAME")
 
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
 	log.Info(dbUser)
@@ -33,7 +28,7 @@ func ConnectDB() (*gorm.DB, error) {
 	}
 
 	DB = db
-	err = db.AutoMigrate(&models.Account{}, &models.User{})
+	err = db.AutoMigrate(&model.Account{}, &model.User{})
 	if err != nil {
 		return nil, err
 	}
