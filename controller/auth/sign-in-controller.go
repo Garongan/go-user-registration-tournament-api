@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"go-user-registration-tournament/database"
+	"go-user-registration-tournament/dto"
 	"go-user-registration-tournament/model"
 	"golang.org/x/crypto/bcrypt"
 	"os"
@@ -18,28 +19,28 @@ func CheckPasswordHash(password, hash []byte) bool {
 func SignIn(c *fiber.Ctx) error {
 	var data map[string]string
 	if err := c.BodyParser(&data); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status_code": fiber.StatusBadRequest,
-			"message":     "Failed to parse request body",
-			"data":        nil,
+		return c.Status(fiber.StatusBadRequest).JSON(dto.Response{
+			StatusCode: fiber.StatusBadRequest,
+			Message:    "Failed to parse request body",
+			Data:       nil,
 		})
 	}
 
 	var account model.Account
 	database.DB.Where("username = ?", data["username"]).First(&account)
 	if account.ID == "" {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"status_code": fiber.StatusUnauthorized,
-			"message":     "Invalid username or password",
-			"data":        nil,
+		return c.Status(fiber.StatusUnauthorized).JSON(dto.Response{
+			StatusCode: fiber.StatusUnauthorized,
+			Message:    "Invalid username or password",
+			Data:       nil,
 		})
 	}
 
 	if CheckPasswordHash([]byte(account.Password), []byte(data["password"])) {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"status_code": fiber.StatusUnauthorized,
-			"message":     "Invalid username or password",
-			"data":        nil,
+		return c.Status(fiber.StatusUnauthorized).JSON(dto.Response{
+			StatusCode: fiber.StatusUnauthorized,
+			Message:    "Invalid username or password",
+			Data:       nil,
 		})
 	}
 
@@ -50,10 +51,10 @@ func SignIn(c *fiber.Ctx) error {
 
 	token, err := claims.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status_code": fiber.StatusInternalServerError,
-			"message":     "Failed to generate token",
-			"data":        nil,
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.Response{
+			StatusCode: fiber.StatusInternalServerError,
+			Message:    "Failed to generate token",
+			Data:       nil,
 		})
 	}
 
@@ -71,11 +72,13 @@ func SignIn(c *fiber.Ctx) error {
 	var user model.User
 	database.DB.Where("account_id = ?", account.ID).First(&user)
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Login Success",
-		"data": fiber.Map{
-			"user_id": user.ID,
-			"token":   token,
-		},
+	dataResponse := fiber.Map{
+		"user_id": user.ID,
+		"token":   token,
+	}
+	return c.Status(fiber.StatusOK).JSON(dto.Response{
+		StatusCode: fiber.StatusOK,
+		Message:    "Login Success",
+		Data:       dataResponse,
 	})
 }

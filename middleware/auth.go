@@ -4,6 +4,7 @@ import (
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"go-user-registration-tournament/config"
+	"go-user-registration-tournament/dto"
 )
 
 func Protected() fiber.Handler {
@@ -15,17 +16,15 @@ func Protected() fiber.Handler {
 
 func jwtError(c *fiber.Ctx, err error) error {
 	if err.Error() == "Missing or malformed JWT" {
-		return c.Status(fiber.StatusBadRequest).
-			JSON(fiber.Map{
-				"status_code": fiber.StatusBadRequest,
-				"message":     "Missing or malformed JWT",
-				"data":        nil,
-			})
-	}
-	return c.Status(fiber.StatusUnauthorized).
-		JSON(fiber.Map{
-			"status_code": fiber.StatusUnauthorized,
-			"message":     "Invalid or expired JWT",
-			"data":        nil,
+		return c.Status(fiber.StatusBadRequest).JSON(dto.Response{
+			StatusCode: fiber.StatusBadRequest,
+			Message:    "Missing ot malformed JWT",
+			Data:       nil,
 		})
+	}
+	return c.Status(fiber.StatusUnauthorized).JSON(dto.Response{
+		StatusCode: fiber.StatusUnauthorized,
+		Message:    "Invalid or expired JWT",
+		Data:       nil,
+	})
 }
