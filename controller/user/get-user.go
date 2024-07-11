@@ -2,42 +2,32 @@ package user
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 	"go-user-registration-tournament/database"
+	"go-user-registration-tournament/dto"
 	"go-user-registration-tournament/model"
-	"os"
 )
 
 func GetUser(c *fiber.Ctx) error {
-
-	cookie := c.Cookies("jwt")
-
-	token, err := jwt.ParseWithClaims(cookie, &jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET")), nil
-	})
-
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "Unauthorized",
-		})
-	}
-
-	claims, ok := token.Claims.(*jwt.MapClaims)
-
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Failed to parse claims",
-		})
-	}
-
-	accountID, _ := (*claims)["sub"].(string)
-	account := model.Account{ID: accountID}
-
-	database.DB.Where("id = ?", accountID).First(&account)
-
+	id := c.Params("id")
+	db := database.DB
 	var user model.User
-	database.DB.Where("account_id = ?", account.ID).First(&user)
-
+	db.Where("id = ?", id).First(&user)
+	if user.ID == "" {
+		return c.Status(fiber.StatusNotFound).JSON(dto.Response{
+			StatusCode: fiber.StatusNotFound,
+			Message:    "No user found with ID",
+			Data:       nil,
+		})
+	}
+	var account model.Account
+	db.Where("id = ?", user.AccountID).First(&account)
+	if account.ID == "" {
+		return c.Status(fiber.StatusNotFound).JSON(dto.Response{
+			StatusCode: fiber.StatusNotFound,
+			Message:    "No account found with ID",
+			Data:       nil,
+		})
+	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"id":       user.ID,
 		"name":     user.Name,

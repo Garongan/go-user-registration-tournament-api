@@ -9,8 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-
 func ConnectDB() (*gorm.DB, error) {
 	dbUser := config.Config("DB_USER")
 	dbPassword := config.Config("DB_PASSWORD")
