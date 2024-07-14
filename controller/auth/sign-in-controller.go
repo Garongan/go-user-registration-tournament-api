@@ -8,6 +8,7 @@ import (
 	"go-user-registration-tournament/model"
 	"golang.org/x/crypto/bcrypt"
 	"os"
+	"regexp"
 	"time"
 )
 
@@ -22,6 +23,34 @@ func SignIn(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(dto.Response{
 			StatusCode: fiber.StatusBadRequest,
 			Message:    "Failed to parse request body",
+			Data:       nil,
+		})
+	}
+
+	ok := len(data["username"]) >= 6 && len(data["username"]) <= 15
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(dto.Response{
+			StatusCode: fiber.StatusBadRequest,
+			Message:    "Username length must be between 6 and 15 characters",
+			Data:       nil,
+		})
+	}
+
+	pattern := regexp.MustCompile("^[a-zA-Z0-9]+$")
+	ok = pattern.MatchString(data["username"])
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(dto.Response{
+			StatusCode: fiber.StatusBadRequest,
+			Message:    "Username should only use alphabet and numbers",
+			Data:       nil,
+		})
+	}
+
+	ok = len(data["password"]) >= 8 && len(data["password"]) <= 20
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(dto.Response{
+			StatusCode: fiber.StatusBadRequest,
+			Message:    "Password length must be between 8 and 20 characters",
 			Data:       nil,
 		})
 	}
